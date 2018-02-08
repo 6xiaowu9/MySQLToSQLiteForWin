@@ -36,6 +36,8 @@ class ConvertDB
 	function __construct( )
 	{
 		$this->mysql = $this->mysql();
+		$this->createFile("cache");
+		$this->createFile("db");
 		ini_set("memory_limit", $this->memory );
 		$this->start( $this->tables );
 	}
@@ -189,6 +191,12 @@ class ConvertDB
 			echo "打开文件失败\n"; 
 		}
 		return true;
+	}
+
+	public function createFile( $dir ){
+		if (!file_exists($dir)){
+            mkdir ($dir,0777,true);
+        }
 	}
 }
 new ConvertDB();
