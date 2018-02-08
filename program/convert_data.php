@@ -23,6 +23,9 @@ class ConvertDB
 		'test',
 	];
 
+	// 是否加密
+	private $private = false;
+
 	// 数据库对应密码
 	private $key = [
 		'test' => 'TEST_KEY',
@@ -44,7 +47,11 @@ class ConvertDB
 		foreach ( $tables as $table ) {
 			if( !$table ){ echo ('表名错误');break;}
 			$export_csv = $this->exportTableToCsv_v1( $table , $this->convertTable( $table ));
-			$commands .= ".\sqlite\sqlite3.exe .\cache\\{$table}.db < .\cache\\{$table}.txt\r\necho .\r\ndel /Q {$this->DBToFile}\\{$table}.db\r\necho .\r\n.\sqlite\sqlcipher.exe .\cache\\{$table}.db < .\cache\\{$table}_key.txt\r\n";
+			if( $this->private ){
+				$commands .= ".\sqlite\sqlite3.exe .\cache\\{$table}.db < .\cache\\{$table}.txt\r\necho .\r\ndel /Q {$this->DBToFile}\\{$table}.db\r\necho .\r\n.\sqlite\sqlcipher.exe .\cache\\{$table}.db < .\cache\\{$table}_key.txt\r\n";
+			}else{
+				$commands .= "del /Q {$this->DBToFile}\\{$table}.db\r\necho .\r\n.\sqlite\sqlite3.exe {$this->DBToFile}\\{$table}.db < .\cache\\{$table}.txt\r\n";
+			}
 		}
 		$this->genarateConvertCommandsBAT("@echo off\r\n".$commands."echo ---------------------完成迁移-------------------\r\necho MySQL to SQLite. File:{$this->DBToFile}\r\n");
 		echo "生成完成！\r\n";
